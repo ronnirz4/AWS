@@ -16,11 +16,11 @@ pipeline {
         // Define environment variables
         AWS_REGION = 'us-east-2'
         ACCOUNT_ID = '023196572641'
-        APP_IMAGE = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/app-repo:app:${BUILD_NUMBER}"
+        APP_IMAGE = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/app-repo:app"
         CHART_VERSION = "0.1.${BUILD_NUMBER}"
         KUBECONFIG = "${env.WORKSPACE}/.kube/config"
         DOCKER_REPO = 'ronn4/repo1'
-        DOCKERHUB_CREDENTIALS = 'dockerhub
+        DOCKERHUB_CREDENTIALS = 'dockerhub'
     }
 
     stages {
@@ -29,11 +29,10 @@ pipeline {
                 sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
             }
         }
-        stage('Pull and Tag Docker Image') {
+        stage('Build, Tag, and Push Docker Image') {
             steps {
                 sh """
-                    docker build -t ${APP_IMAGE} .
-                    docker tag ${APP_IMAGE} ${APP_IMAGE}:${BUILD_NUMBER}
+                    docker build -t ${APP_IMAGE}:${BUILD_NUMBER} .
                     docker push ${APP_IMAGE}:${BUILD_NUMBER}
                 """
             }
