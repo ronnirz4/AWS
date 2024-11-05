@@ -10,9 +10,10 @@ pipeline {
     }
 
     environment {
-        AWS_REGION = 'us-east-2'
-        ACCOUNT_ID = '023196572641'
-        ECR_REPO = "ronn4/app-repo"
+        AWS_REGION = 'us-east-2'  // Your AWS region
+        ACCOUNT_ID = '023196572641' // Your AWS account ID
+        // Set ECR_REPO to the full URI of your ECR repository
+        ECR_REPO = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ronn4/app-repo"
         IMAGE_TAG = "${BUILD_NUMBER}"
         APP_IMAGE = "${ECR_REPO}:app-${IMAGE_TAG}"
         CHART_VERSION = "0.1.${BUILD_NUMBER}"
