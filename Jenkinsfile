@@ -20,9 +20,50 @@ pipeline {
         DOCKER_REPO = 'ronn4/repo1'
         DOCKERHUB_CREDENTIALS = 'dockerhub'
         NAMESPACE = 'ronn4-jenkins'
+        APP_IMAGE_NAME = 'app-image-latest'
+        WEB_IMAGE_NAME = 'web-image-latest'
     }
 
     stages {
+        stage('Checkout and Extract Git Commit Hash') {
+            steps {
+                // Checkout code
+                checkout scm
+
+                // Extract Git commit hash
+                script {
+                    sh 'git rev-parse --short HEAD > gitCommit.txt'
+                    def GITCOMMIT = readFile('gitCommit.txt').trim()
+                    env.GIT_TAG = "${GITCOMMIT}"
+
+                    // Set IMAGE_TAG as an environment variable
+                    env.IMAGE_TAG = "v1.0.0-${BUILD_NUMBER}-${GIT_TAG}"
+                }
+            }
+        }
+
+        stage('Install Python Requirements') {
+            steps {
+                // Install Python dependencies
+                sh """
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install pytest unittest2 pylint flask telebot Pillow loguru matplotlib
+                """
+            }
+        }
+
+        stage('Unittest') {
+            steps {
+                // Run unittests
+                sh """
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    python -m pytest --junitxml results.xml polybot/test
+                """
+            }
+        }
+
         stage('ECR Login') {
             steps {
                 script {
@@ -30,7 +71,8 @@ pipeline {
                 }
             }
         }
-        stage('Build, Tag, and Push Docker Image') {
+
+        stage('Build, Tag, and Push Images') {
             steps {
                 sh """
                     docker build -t ${APP_IMAGE} .
@@ -38,6 +80,7 @@ pipeline {
                 """
             }
         }
+
         stage('Package and Deploy Helm Chart') {
             steps {
                 script {
