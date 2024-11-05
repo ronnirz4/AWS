@@ -72,12 +72,17 @@ pipeline {
             }
         }
 
-        stage('Build, Tag, and Push Images') {
+        stage('Login, Tag, and Push Images') {
             steps {
-                sh """
-                    docker build -t ${APP_IMAGE} .
+                script {
+                    // Login to Dockerhub, tag, and push images
+                    sh """
+                    cd polybot
+                    docker build -t ${APP_IMAGE_NAME}:latest .
+                    docker tag ${APP_IMAGE_NAME}:latest ${APP_IMAGE}
                     docker push ${APP_IMAGE}
-                """
+                    """
+                }
             }
         }
 
