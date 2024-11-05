@@ -87,16 +87,28 @@ pipeline {
             }
         }
 
-        stage('Package and Deploy Helm Chart') {
+         stage('Package Helm Chart') {
             steps {
                 script {
+                    // Update the chart version in Chart.yaml and package the chart
                     sh """
                         sed -i 's/^version:.*/version: ${CHART_VERSION}/' my-python-app-chart/Chart.yaml
                         helm package ./my-python-app-chart
-                        helm upgrade --install my-python-app ./my-python-app-${CHART_VERSION}.tgz \
-                        --atomic --wait \
-                        --namespace ${NAMESPACE}
                     """
+                }
+            }
+        }
+        stage('Deploy with Helm') {
+            steps {
+                script {
+                    withEnv(["KUBECONFIG=/home/ec2-user/.kube/config"]) {
+                        sh """
+                            helm upgrade --install my-python-app ./my-python-app-${CHART_VERSION}.tgz \
+                            --set image.tag=app-image-0.3.${BUILD_NUMBER} \
+                            --atomic --wait \
+                            --namespace ronn4-test
+                        """
+                    }
                 }
             }
         }
