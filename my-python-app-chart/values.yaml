@@ -1,4 +1,4 @@
-name: my-python-app-chart
+name: my-python-app
 namespace: ronn4-test
 replicaCount: 2
 
