@@ -105,7 +105,6 @@ pipeline {
                         sh """
                             helm upgrade --install my-python-app ./my-python-app-${CHART_VERSION}.tgz \
                             --set image.tag=app-image-0.3.${BUILD_NUMBER} \
-                            --atomic --wait --timeout 600s \
                             --namespace ronn4-test
                         """
                     }
