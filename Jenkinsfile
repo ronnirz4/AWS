@@ -104,7 +104,7 @@ pipeline {
                     withEnv(["KUBECONFIG=/home/ec2-user/.kube/config"]) {
                         sh """
                             helm upgrade --install my-python-app ./my-python-app-${CHART_VERSION}.tgz \
-                            --set image.tag=app-image-0.3.${BUILD_NUMBER} \
+                            --set image.tag=app-image-28.0.${BUILD_NUMBER} \
                             --namespace ronn4-test
                         """
                     }
