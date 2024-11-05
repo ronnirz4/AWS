@@ -1,26 +1,40 @@
-replicaCount: 3
+name: my-python-app-chart
+namespace: ronn4-test
+replicaCount: 2
 
 image:
-  repository: ronn4/app-image
-  tag: "last"
+  repository: 023196572641.dkr.ecr.us-east-2.amazonaws.com/ronn4/app-repo
+  tag: "app-image-0.3.${BUILD_NUMBER}"
   pullPolicy: IfNotPresent
 
-service:
-  type: NodePort
-  port: 8443
+resources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 250m
+    memory: 64Mi
 
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
+hpa:
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 50
+
+pvc:
+  storage: 1Gi
 ingress:
-  enabled: true
-  annotations: {}
-  hosts:
-    - host: my-python-app.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
+  host: nginx.local
 
-resources: {}
-nodeSelector: {}
-tolerations: []
-affinity: {}
-namespace: demoapp  # Explicitly set the namespace
+env:
+  TELEGRAM_TOKEN_SECRET: telegram-token-secret
+
+imagePullSecrets:
+  - name: ecr-registry-secret
