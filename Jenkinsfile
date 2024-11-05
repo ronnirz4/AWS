@@ -13,8 +13,8 @@ pipeline {
         AWS_REGION = 'us-east-2'
         ACCOUNT_ID = '023196572641'
         ECR_REPO = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/app-repo"
-        APP_IMAGE = "${ECR_REPO}:app"
         IMAGE_TAG = "${BUILD_NUMBER}"
+        APP_IMAGE = "${ECR_REPO}:app-${IMAGE_TAG}"
         CHART_VERSION = "0.1.${BUILD_NUMBER}"
         KUBECONFIG = "${env.WORKSPACE}/.kube/config"
         DOCKER_REPO = 'ronn4/repo1'
@@ -33,8 +33,8 @@ pipeline {
         stage('Build, Tag, and Push Docker Image') {
             steps {
                 sh """
-                    docker build -t ${APP_IMAGE}:${IMAGE_TAG} .
-                    docker push ${APP_IMAGE}:${IMAGE_TAG}
+                    docker build -t ${APP_IMAGE} .
+                    docker push ${APP_IMAGE}
                 """
             }
         }
