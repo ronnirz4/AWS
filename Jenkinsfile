@@ -16,7 +16,7 @@ pipeline {
         ECR_REPO = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ronn4/app-repo"
         IMAGE_TAG = "${BUILD_NUMBER}"
         APP_IMAGE = "${ECR_REPO}:app-${IMAGE_TAG}"
-        CHART_VERSION = "0.1.${BUILD_NUMBER}"
+        CHART_VERSION = "0.28.${BUILD_NUMBER}"
         KUBECONFIG = "${env.WORKSPACE}/.kube/config"
         DOCKER_REPO = 'ronn4/repo1'
         DOCKERHUB_CREDENTIALS = 'dockerhub'
