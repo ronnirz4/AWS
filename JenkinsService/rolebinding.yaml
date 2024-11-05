@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: jenkins-deployment-binding
+  namespace: ronn4-pollyapp
+subjects:
+- kind: ServiceAccount
+  name: jenkins-admin
+  namespace: ronn4-jenkins
+roleRef:
+  kind: Role
+  name: jenkins-deployment-manager
+  apiGroup: rbac.authorization.k8s.io
+
+
