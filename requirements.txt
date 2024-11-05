@@ -1,0 +1,6 @@
+loguru==0.7.2
+matplotlib==3.9.1
+pylint==3.2.5
+pyTelegramBotAPI==4.21.0
+pytest==8.2.2
+unittest2==1.1.0
