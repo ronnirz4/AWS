@@ -73,10 +73,10 @@ pipeline {
             }
         }
 
-        stage('Login, Tag, and Push Images') {
+        stage('Login, Tag, and Push Images to ECR') {
             steps {
                 script {
-                    // Login to Dockerhub, tag, and push images
+                    // Build the Docker image and push to ECR
                     sh """
                     cd polybot
                     docker build -t ${APP_IMAGE_NAME}:latest .
