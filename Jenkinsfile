@@ -12,7 +12,6 @@ pipeline {
     environment {
         AWS_REGION = 'us-east-2'  // Your AWS region
         ACCOUNT_ID = '023196572641' // Your AWS account ID
-        // Set ECR_REPO to the full URI of your ECR repository
         ECR_REPO = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ronn4/app-repo"
         IMAGE_TAG = "${BUILD_NUMBER}"
         APP_IMAGE = "${ECR_REPO}:app-${IMAGE_TAG}"
@@ -28,16 +27,11 @@ pipeline {
     stages {
         stage('Checkout and Extract Git Commit Hash') {
             steps {
-                // Checkout code
                 checkout scm
-
-                // Extract Git commit hash
                 script {
                     sh 'git rev-parse --short HEAD > gitCommit.txt'
                     def GITCOMMIT = readFile('gitCommit.txt').trim()
                     env.GIT_TAG = "${GITCOMMIT}"
-
-                    // Set IMAGE_TAG as an environment variable
                     env.IMAGE_TAG = "v1.0.0-${BUILD_NUMBER}-${GIT_TAG}"
                 }
             }
@@ -45,7 +39,6 @@ pipeline {
 
         stage('Install Python Requirements') {
             steps {
-                // Install Python dependencies
                 sh """
                     python3 -m venv venv
                     . venv/bin/activate
@@ -56,7 +49,6 @@ pipeline {
 
         stage('Unittest') {
             steps {
-                // Run unittests
                 sh """
                     python3 -m venv venv
                     . venv/bin/activate
@@ -76,7 +68,6 @@ pipeline {
         stage('Login, Tag, and Push Images to ECR') {
             steps {
                 script {
-                    // Build the Docker image and push to ECR
                     sh """
                     cd polybot
                     docker build -t ${APP_IMAGE_NAME}:latest .
@@ -87,10 +78,9 @@ pipeline {
             }
         }
 
-         stage('Package Helm Chart') {
+        stage('Package Helm Chart') {
             steps {
                 script {
-                    // Update the chart version in Chart.yaml and package the chart
                     sh """
                         sed -i 's/^version:.*/version: ${CHART_VERSION}/' my-python-app-chart/Chart.yaml
                         helm package ./my-python-app-chart
@@ -98,6 +88,7 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy with Helm') {
             steps {
                 script {
@@ -111,9 +102,8 @@ pipeline {
                 }
             }
         }
-    }
 
-    stage('Publish to SNS') {
+        stage('Publish to SNS') {
             steps {
                 script {
                     sh 'aws sns publish --topic-arn arn:aws:sns:us-east-2:023196572641:ronn4-sns --message "Build Notification from Jenkins"'
@@ -123,22 +113,22 @@ pipeline {
     }
 
     post {
-    success {
-        script {
-            sh """
-                aws sns publish --topic-arn arn:aws:sns:us-east-2:023196572641:ronn4-sns --message "Build succeeded for ${env.JOB_NAME} #${env.BUILD_NUMBER}" --subject "Jenkins Build Success"
-            """
+        success {
+            script {
+                sh """
+                    aws sns publish --topic-arn arn:aws:sns:us-east-2:023196572641:ronn4-sns --message "Build succeeded for ${env.JOB_NAME} #${env.BUILD_NUMBER}" --subject "Jenkins Build Success"
+                """
+            }
         }
-    }
-    failure {
-        script {
-            sh """
-                aws sns publish --topic-arn arn:aws:sns:us-east-2:023196572641:ronn4-sns --message "Build failed for ${env.JOB_NAME} #${env.BUILD_NUMBER}" --subject "Jenkins Build Failure"
-            """
+        failure {
+            script {
+                sh """
+                    aws sns publish --topic-arn arn:aws:sns:us-east-2:023196572641:ronn4-sns --message "Build failed for ${env.JOB_NAME} #${env.BUILD_NUMBER}" --subject "Jenkins Build Failure"
+                """
+            }
         }
-    }
-    always {
-        cleanWs() // Clean workspace after every build, regardless of success or failure
+        always {
+            cleanWs() // Clean workspace after every build, regardless of success or failure
+        }
     }
 }
-
