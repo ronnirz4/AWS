@@ -113,34 +113,33 @@ pipeline {
         }
     }
 
-    stage('Notify') {
+    stage('Publish to SNS') {
             steps {
                 script {
-                    // Notification logic moved to a script block
-                    if (currentBuild.result == 'SUCCESS') {
-                        snsPublish(
-                            topicArn: 'arn:aws:sns:us-east-2:023196572641:ronn4-sns',
-                            message: "Build succeeded for ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                            subject: "Jenkins Build Success"
-                        )
-                    } else if (currentBuild.result == 'FAILURE') {
-                        snsPublish(
-                            topicArn: 'arn:aws:sns:us-east-2:023196572641:ronn4-sns',
-                            message: "Build failed for ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                            subject: "Jenkins Build Failure"
-                        )
-                    }
-                    // Clean workspace after notifying
-                    cleanWs()
+                    sh 'aws sns publish --topic-arn arn:aws:sns:us-east-2:023196572641:ronn4-sns --message "Build Notification from Jenkins"'
                 }
             }
         }
     }
 
     post {
+        success {
+            snsPublish(
+                topicArn: 'arn:aws:sns:us-east-2:023196572641:ronn4-sns',
+                message: "Build succeeded for ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                subject: "Jenkins Build Success"
+            )
+        }
+        failure {
+            snsPublish(
+                topicArn: 'arn:aws:sns:us-east-2:023196572641:ronn4-sns',
+                message: "Build failed for ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                subject: "Jenkins Build Failure"
+            )
+        }
         always {
-            // Ensure workspace is cleaned even if not done in the Notify stage
-            cleanWs()
+            cleanWs() // Clean workspace after every build, regardless of success or failure
         }
     }
 }
+
