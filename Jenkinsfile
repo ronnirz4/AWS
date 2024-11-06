@@ -113,6 +113,16 @@ pipeline {
         }
     }
 
+    stage('Publish to SNS') {
+            steps {
+                script {
+                    // Publish to SNS topic using AWS CLI
+                    sh 'aws sns publish --topic-arn arn:aws:sns:us-east-1:023196572641:ronn4-sns
+                }
+            }
+        }
+    }
+
     post {
         success {
             snsPublish(
@@ -129,7 +139,7 @@ pipeline {
             )
         }
         always {
-            cleanWs()
+            cleanWs() // Clean workspace after every build, regardless of success or failure
         }
     }
 }
