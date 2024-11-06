@@ -123,23 +123,22 @@ pipeline {
     }
 
     post {
-        success {
-            snsPublish(
-                topicArn: 'arn:aws:sns:us-east-2:023196572641:ronn4-sns',
-                message: "Build succeeded for ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                subject: "Jenkins Build Success"
-            )
+    success {
+        script {
+            sh """
+                aws sns publish --topic-arn arn:aws:sns:us-east-2:023196572641:ronn4-sns --message "Build succeeded for ${env.JOB_NAME} #${env.BUILD_NUMBER}" --subject "Jenkins Build Success"
+            """
         }
-        failure {
-            snsPublish(
-                topicArn: 'arn:aws:sns:us-east-2:023196572641:ronn4-sns',
-                message: "Build failed for ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                subject: "Jenkins Build Failure"
-            )
+    }
+    failure {
+        script {
+            sh """
+                aws sns publish --topic-arn arn:aws:sns:us-east-2:023196572641:ronn4-sns --message "Build failed for ${env.JOB_NAME} #${env.BUILD_NUMBER}" --subject "Jenkins Build Failure"
+            """
         }
-        always {
-            cleanWs() // Clean workspace after every build, regardless of success or failure
-        }
+    }
+    always {
+        cleanWs() // Clean workspace after every build, regardless of success or failure
     }
 }
 
