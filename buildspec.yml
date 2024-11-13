@@ -17,7 +17,7 @@ phases:
       - . venv/bin/activate
       - python -m pytest --junitxml results.xml polybot/test
       - echo Building Docker image...
-      - docker build -t $APP_IMAGE_NAME:latest .
+      - docker build -t $APP_IMAGE_NAME:latest -f ./nginx/Dockerfile .
       - docker tag $APP_IMAGE_NAME:latest $APP_IMAGE
       - docker push $APP_IMAGE
   post_build:
@@ -29,7 +29,7 @@ phases:
       - helm upgrade --install my-python-app ./my-python-app-chart \
         --set image.tag=$IMAGE_TAG --namespace $NAMESPACE
       - echo Publishing SNS notification...
-      - aws sns publish --topic-arn arn:aws:sns:$AWS_REGION:$ACCOUNT_ID:ronn4-sns --message "Build completed for CodeBuild project"
+      - aws sns publish --topic-arn arn:aws:sns:us-east-2:$ACCOUNT_ID:ronn4-sns --message "Build completed for CodeBuild project"
 artifacts:
   files:
     - results.xml
