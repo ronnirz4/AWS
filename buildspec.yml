@@ -1,0 +1,35 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Installing Python dependencies...
+      - python3 -m venv venv
+      - . venv/bin/activate
+      - pip install pytest unittest2 pylint flask telebot Pillow loguru matplotlib
+  pre_build:
+    commands:
+      - echo Logging into ECR...
+      - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 023196572641.dkr.ecr.us-east-2.amazonaws.com/ronn4/app-repo
+  build:
+    commands:
+      - echo Running unit tests...
+      - . venv/bin/activate
+      - python -m pytest --junitxml results.xml polybot/test
+      - echo Building Docker image...
+      - docker build -t $APP_IMAGE_NAME:latest .
+      - docker tag $APP_IMAGE_NAME:latest $APP_IMAGE
+      - docker push $APP_IMAGE
+  post_build:
+    commands:
+      - echo Packaging Helm chart...
+      - sed -i 's/^version:.*/version: ${CHART_VERSION}/' my-python-app-chart/Chart.yaml
+      - helm package ./my-python-app-chart
+      - echo Deploying with Helm...
+      - helm upgrade --install my-python-app ./my-python-app-chart \
+        --set image.tag=$IMAGE_TAG --namespace $NAMESPACE
+      - echo Publishing SNS notification...
+      - aws sns publish --topic-arn arn:aws:sns:$AWS_REGION:$ACCOUNT_ID:ronn4-sns --message "Build completed for CodeBuild project"
+artifacts:
+  files:
+    - results.xml
