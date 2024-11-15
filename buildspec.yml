@@ -7,12 +7,9 @@ env:
     ECR_REPO: "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ronn4/app-repo"
     IMAGE_TAG: "${CODEBUILD_BUILD_ID}"
     APP_IMAGE: "${ECR_REPO}:app-${IMAGE_TAG}"
-    CHART_VERSION: "0.2.${CODEBUILD_BUILD_ID}"
     DOCKER_REPO: 'ronn4/repo1'
     NAMESPACE: 'ronn4-jenkins'
     APP_IMAGE_NAME: 'app-image-latest'
-    WEB_IMAGE_NAME: 'web-image-latest'
-    KUBECONFIG: "/tmp/.kube/config"
 
 phases:
   install:
@@ -27,7 +24,7 @@ phases:
   pre_build:
     commands:
       - echo "Checking out code..."
-      - git clone https://github.com/ronnirz4/AWS.git . # Replace with your repository URL
+      - git clone https://github.com/ronnirz4/AWS.git .  # Replace with your repository URL
       - git rev-parse --short HEAD > gitCommit.txt
       - |
         GIT_TAG=$(cat gitCommit.txt)
@@ -53,13 +50,3 @@ phases:
 artifacts:
   files:
     - results.xml
-
-notifications:
-  success:
-    - sns: arn:aws:sns:us-east-2:023196572641:ronn4-sns
-    - message: "Build succeeded for $CODEBUILD_PROJECT_NAME #$CODEBUILD_BUILD_ID"
-    - subject: "Build Success"
-  failure:
-    - sns: arn:aws:sns:us-east-2:023196572641:ronn4-sns
-    - message: "Build failed for $CODEBUILD_PROJECT_NAME #$CODEBUILD_BUILD_ID"
-    - subject: "Build Failure"
