@@ -6,7 +6,7 @@ env:
     ACCOUNT_ID: '023196572641'
     ECR_REPO: "023196572641.dkr.ecr.us-east-2.amazonaws.com/ronn4/app-repo"
     IMAGE_TAG: "${CODEBUILD_BUILD_ID}"
-    APP_IMAGE: "${ECR_REPO,,}:app-${IMAGE_TAG}"  # Add the `,,` here to convert to lowercase
+    APP_IMAGE: "${ECR_REPO}:app-${IMAGE_TAG}"
     DOCKER_REPO: 'ronn4/repo1'
     NAMESPACE: 'ronn4-jenkins'
     APP_IMAGE_NAME: 'app-image-latest'
@@ -34,6 +34,9 @@ phases:
       - |
         GIT_TAG=$(cat gitCommit.txt)
         export IMAGE_TAG="v1.0.0-${CODEBUILD_BUILD_ID}-${GIT_TAG}"
+        # Convert ECR_REPO to lowercase and export APP_IMAGE
+        export ECR_REPO_LOWER=$(echo $ECR_REPO | tr '[:upper:]' '[:lower:]')
+        export APP_IMAGE="${ECR_REPO_LOWER}:app-${IMAGE_TAG}"
       - echo "Logging into ECR..."
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
     finally:
