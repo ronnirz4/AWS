@@ -49,7 +49,3 @@ phases:
       - docker push $APP_IMAGE
     finally:
       - echo "Build phase complete."
-
-artifacts:
-  files:
-    - results.xml
