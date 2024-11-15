@@ -15,12 +15,10 @@ phases:
   install:
     commands:
       - echo "Installing Python dependencies..."
-      - python3 --version  # Ensure python3 is available
-      - python3 -m pip --version  # Ensure pip is available
-      - python3 -m venv venv  # Create the virtual environment
-      - . venv/bin/activate  # Activate the virtual environment
-      - pip install --upgrade pip  # Upgrade pip inside the venv
-      - pip install pytest unittest2 pylint flask telebot Pillow loguru matplotlib  # Install dependencies
+      - mkdir -p build/venv  # Create the venv directory if it doesn't exist
+      - python3 -m venv build/venv  # Create the virtual environment inside the 'build' folder
+      - . build/venv/bin/activate  # Activate the virtual environment
+      - pip install pytest unittest2 pylint flask telebot Pillow loguru matplotlib
     finally:
       - echo "Completed installation phase."
 
