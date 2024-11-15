@@ -4,12 +4,13 @@ env:
   variables:
     AWS_REGION: 'us-east-2'
     ACCOUNT_ID: '023196572641'
-    ECR_REPO: "023196572641.dkr.ecr.us-east-2.amazonaws.com/ronn4/app-repo"  # Full ECR URL
+    ECR_REPO: "023196572641.dkr.ecr.us-east-2.amazonaws.com/ronn4/app-repo"
     IMAGE_TAG: "${CODEBUILD_BUILD_ID}"
-    APP_IMAGE: "${ECR_REPO}:app-${IMAGE_TAG}"
+    APP_IMAGE: "${ECR_REPO,,}:app-${IMAGE_TAG}"  # Add the `,,` here to convert to lowercase
     DOCKER_REPO: 'ronn4/repo1'
     NAMESPACE: 'ronn4-jenkins'
     APP_IMAGE_NAME: 'app-image-latest'
+
 
 phases:
   install:
