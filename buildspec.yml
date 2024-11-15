@@ -40,8 +40,6 @@ phases:
 
   build:
     commands:
-      - echo "Running unit tests..."
-      - . venv/bin/activate
       - python -m pytest --junitxml results.xml polybot/test
       - echo "Building Docker image..."
       - cd polybot
