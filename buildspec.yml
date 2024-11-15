@@ -24,7 +24,8 @@ phases:
   pre_build:
     commands:
       - echo "Checking out code..."
-      - git --version  # Check if git is available in the container
+      - git --version  # Ensure git is available
+      - rm -rf * .git  # Remove all files and the existing Git repository, if any
       - git clone https://github.com/ronnirz4/AWS.git .
       - git rev-parse --short HEAD > gitCommit.txt
       - cat gitCommit.txt
@@ -35,6 +36,7 @@ phases:
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
     finally:
       - echo "Pre-build phase complete."
+
 
 
   build:
