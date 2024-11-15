@@ -21,6 +21,8 @@ phases:
       - python3 -m venv venv
       - . venv/bin/activate
       - pip install pytest unittest2 pylint flask telebot Pillow loguru matplotlib
+    finally:
+      - echo "Completed installation phase."
 
   pre_build:
     commands:
@@ -31,6 +33,8 @@ phases:
         export IMAGE_TAG="v1.0.0-${CODEBUILD_BUILD_ID}-${GIT_TAG}"
       - echo "Logging into ECR..."
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+    finally:
+      - echo "Pre-build phase complete."
 
   build:
     commands:
@@ -42,6 +46,8 @@ phases:
       - docker build -t $APP_IMAGE_NAME:latest .
       - docker tag $APP_IMAGE_NAME:latest $APP_IMAGE
       - docker push $APP_IMAGE
+    finally:
+      - echo "Build phase complete."
 
 artifacts:
   files:
