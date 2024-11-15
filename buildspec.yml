@@ -27,6 +27,7 @@ phases:
   pre_build:
     commands:
       - echo "Checking out code..."
+      - git clone https://github.com/ronnirz4/AWS.git . # Replace with your repository URL
       - git rev-parse --short HEAD > gitCommit.txt
       - |
         GIT_TAG=$(cat gitCommit.txt)
