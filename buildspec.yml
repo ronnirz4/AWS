@@ -24,8 +24,10 @@ phases:
   pre_build:
     commands:
       - echo "Checking out code..."
-      - git clone https://github.com/ronnirz4/AWS.git .  # Replace with your repository URL
+      - git --version  # Check if git is available in the container
+      - git clone https://github.com/ronnirz4/AWS.git .
       - git rev-parse --short HEAD > gitCommit.txt
+      - cat gitCommit.txt
       - |
         GIT_TAG=$(cat gitCommit.txt)
         export IMAGE_TAG="v1.0.0-${CODEBUILD_BUILD_ID}-${GIT_TAG}"
@@ -33,6 +35,7 @@ phases:
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
     finally:
       - echo "Pre-build phase complete."
+
 
   build:
     commands:
