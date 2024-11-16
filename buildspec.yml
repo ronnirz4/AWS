@@ -11,6 +11,7 @@ env:
     NAMESPACE: 'ronn4-jenkins'
     APP_IMAGE_NAME: 'app-image-latest'
 
+
 phases:
   install:
     commands:
@@ -49,11 +50,6 @@ phases:
       - docker build -t $APP_IMAGE_NAME:latest .
       - docker tag $APP_IMAGE_NAME:latest $APP_IMAGE
       - docker push $APP_IMAGE
-      - echo "Creating imagedefinitions.json..."
-      - echo '[{"name":"container-name","imageUri":"'$APP_IMAGE'"}]' > imagedefinitions.json
     finally:
       - echo "Build phase complete."
 
-artifacts:
-  files:
-    - imagedefinitions.json  # Ensure the imagedefinitions.json file is included in the output artifact
