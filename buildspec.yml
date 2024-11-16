@@ -51,7 +51,7 @@ phases:
       - docker tag $APP_IMAGE_NAME:latest $APP_IMAGE
       - docker push $APP_IMAGE
       - echo "Creating imagedefinitions.json..."
-      - echo '[{"name": "app-image", "imageUri": "'"$APP_IMAGE"'"}]' > imagedefinitions.json
+      - printf '[{"name": "app-image", "imageUri": "'"$APP_IMAGE"'"}]' > imagedefinitions.json
     finally:
       - echo "Build phase complete."
 
