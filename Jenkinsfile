@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'ec2-fleet'
+        label 'jenkins/release-jenkins-jenkins-agent'
     }
 
     options {
