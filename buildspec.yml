@@ -50,6 +50,7 @@ phases:
       - docker push $APP_IMAGE
       - cd ..
       - echo '[{"name":"app","imageUri":"023196572641.dkr.ecr.us-east-2.amazonaws.com/ronn4/app-repo:app-v1.0.0-1234567890-abcdef12"}]' > imagedefinitions.json
+      - ls -l
     finally:
       - echo "Build phase complete."
 
