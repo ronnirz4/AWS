@@ -11,14 +11,13 @@ env:
     NAMESPACE: 'ronn4-jenkins'
     APP_IMAGE_NAME: 'app-image-latest'
 
-
 phases:
   install:
     commands:
       - echo "Installing Python dependencies..."
-      - mkdir -p build/venv  # Create the venv directory if it doesn't exist
-      - python3 -m venv build/venv  # Create the virtual environment inside the 'build' folder
-      - . build/venv/bin/activate  # Activate the virtual environment
+      - mkdir -p build/venv
+      - python3 -m venv build/venv
+      - . build/venv/bin/activate
       - pip install pytest unittest2 pylint flask telebot Pillow loguru matplotlib
     finally:
       - echo "Completed installation phase."
@@ -26,17 +25,16 @@ phases:
   pre_build:
     commands:
       - echo "Checking out code..."
-      - git --version  # Ensure git is available
-      - mkdir -p repo && cd repo  # Create and change to a new directory
+      - git --version
+      - mkdir -p repo && cd repo
       - git clone https://github.com/ronnirz4/AWS.git .
       - git rev-parse --short HEAD > gitCommit.txt
       - cat gitCommit.txt
       - |
         GIT_TAG=$(cat gitCommit.txt)
         export IMAGE_TAG="v1.0.0-${CODEBUILD_BUILD_ID}-${GIT_TAG}"
-        # Convert ECR_REPO to lowercase and export APP_IMAGE
         export ECR_REPO_LOWER=$(echo $ECR_REPO | tr '[:upper:]' '[:lower:]')
-        export APP_IMAGE="${ECR_REPO_LOWER}:app-${IMAGE_TAG//[:]/-}"  # Replace colons in the tag with hyphens
+        export APP_IMAGE="${ECR_REPO_LOWER}:app-${IMAGE_TAG//[:]/-}"
       - echo "Logging into ECR..."
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
     finally:
@@ -50,6 +48,10 @@ phases:
       - docker build -t $APP_IMAGE_NAME:latest .
       - docker tag $APP_IMAGE_NAME:latest $APP_IMAGE
       - docker push $APP_IMAGE
+      - echo "[{\"name\":\"app-container\",\"imageUri\":\"$APP_IMAGE\"}]" > imagedefinitions.json
     finally:
       - echo "Build phase complete."
 
+artifacts:
+  files:
+    - imagedefinitions.json
