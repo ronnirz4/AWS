@@ -49,6 +49,7 @@ phases:
       - docker tag $APP_IMAGE_NAME:latest $APP_IMAGE
       - docker push $APP_IMAGE
       - echo "[{\"name\":\"app-container\",\"imageUri\":\"$APP_IMAGE\"}]" > imagedefinitions.json
+      - mv imagedefinitions.json ../
     finally:
       - echo "Build phase complete."
 
