@@ -49,9 +49,7 @@ phases:
       - docker tag $APP_IMAGE_NAME:latest $APP_IMAGE
       - docker push $APP_IMAGE
       - cd ..
-      - echo "[{\"name\":\"app-container\",\"imageUri\":\"$APP_IMAGE\"}]" > imagedefinitions.json
-      - echo "Listing files in the root directory..."
-      - ls -alh
+      - echo '[{"name":"app","imageUri":"023196572641.dkr.ecr.us-east-2.amazonaws.com/ronn4/app-repo:app-v1.0.0-1234567890-abcdef12"}]' > imagedefinitions.json
     finally:
       - echo "Build phase complete."
 
