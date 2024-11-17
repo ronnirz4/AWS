@@ -49,13 +49,12 @@ phases:
       - docker tag $APP_IMAGE_NAME:latest $APP_IMAGE
       - docker push $APP_IMAGE
       - cd ..
-      - mkdir -p build
+      - mkdir -p build  # Ensure the build directory exists
       - echo '[{"name":"app","imageUri":"023196572641.dkr.ecr.us-east-2.amazonaws.com/ronn4/app-repo:app-v1.0.0-1234567890-abcdef12"}]' > build/imagedefinitions.json  # File is created in the build directory
       - ls -l build/  # Confirm it's in the build directory
     finally:
       - echo "Build phase complete."
 
-  artifacts:
-    files:
-      - build/imagedefinitions.json  # This specifies the file path in the build directory
-
+artifacts:
+  files:
+    - build/imagedefinitions.json  # Corrected file path in the build directory
